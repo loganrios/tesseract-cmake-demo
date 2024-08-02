@@ -1,0 +1,27 @@
+#+title: Exactly what it says on the tin
+
+We're really trying out here.
+
+* Prerequisites
++ =cmake 3.19^=
++ =ninja= (but not really, just bc I hate slow builds)
++ =pkg-config= possibly, still can't tell
+
+* Building
+#+begin_src sh
+cmake -S . -B build -G ninja
+cmake --build build
+#+end_src
+
+Executable is =build/tess-demo=. No install.
+
+* Roadmap
++ [X] Make a demo that actually compiles and invokes Tesseract
++ [ ] Figure out =tessdata= to actually OCR an image
++ [ ] Eventually rewrite this whole thing in Common Lisp
+
+* Why was this so hard
++ Tesseract's user manual says "we assume you are familiar with compiling and linking" which I am, but not with CMake.
++ CMake's documentation does not have a good best practices introduction.
++ Even the best modern CMake tutorials out there don't really have a way of telling you that individual libraries are quirky and complicated.
++ Because, historically, the system's package manager /was/ the C++ package manager.
