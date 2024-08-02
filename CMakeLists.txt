@@ -36,6 +36,16 @@ FetchContent_Declare(
   GIT_TAG 5.4.0
 )
 
+# Technically not necessary;
+# we could just hard-download `eng.traineddata` from the URL,
+# but this keeps us more flexible.
+FetchContent_Declare(
+  tessdata
+  GIT_REPOSITORY https://github.com/tesseract-ocr/tessdata.git
+  GIT_TAG 4.1.0
+  SOURCE_DIR ${CMAKE_BINARY_DIR}/tessdata
+)
+
 FetchContent_MakeAvailable(zlib)
 
 set(PNG_SHARED OFF CACHE BOOL "")
@@ -61,6 +71,12 @@ set(DISABLE_CURL ON CACHE BOOL "")
 set(DISABLE_OPENCL ON CACHE BOOL "")
 FetchContent_MakeAvailable(tesseract)
 
+add_dependencies(tesseract leptonica)
+
+FetchContent_MakeAvailable(tessdata)
+
+add_custom_target(tessdata)
+
 target_include_directories(libtesseract
   PRIVATE
     ${leptonica_SOURCE_DIR}/src
@@ -69,9 +85,19 @@ target_include_directories(libtesseract
 )
 
 add_executable(tess-demo simple.cpp)
-target_link_libraries(tess-demo PRIVATE libtesseract)
+
+add_dependencies(tess-demo tessdata)
+
+target_link_libraries(tess-demo
+  PRIVATE
+  libtesseract
+  leptonica
+)
+
 target_include_directories(tess-demo
   PRIVATE
   ${tesseract_SOURCE_DIR}/include
   ${tesseract_BINARY_DIR}/include
+  ${leptonica_SOURCE_DIR}/src
+  ${leptonica_BINARY_DIR}/src 
 )

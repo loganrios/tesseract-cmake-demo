@@ -11,13 +11,15 @@ We're really trying out here.
 #+begin_src sh
 cmake -S . -B build -G ninja
 cmake --build build
+pushd build; TESSDATA_PREFIX=tessdata ./tess-demo; popd
 #+end_src
 
-Executable is =build/tess-demo=. No install.
+Executable is =build/tess-demo=. No install. Yeah, you have to do the =pushd= stuff because =sample.png= is in the top-level directory.
 
 * Roadmap
 + [X] Make a demo that actually compiles and invokes Tesseract
-+ [ ] Figure out =tessdata= to actually OCR an image
++ [X] Figure out =tessdata= to actually OCR an image
++ [ ] Remove the parts that I added but maybe aren't actually needed
 + [ ] Eventually rewrite this whole thing in Common Lisp
 
 * Why was this so hard
@@ -25,3 +27,10 @@ Executable is =build/tess-demo=. No install.
 + CMake's documentation does not have a good best practices introduction.
 + Even the best modern CMake tutorials out there don't really have a way of telling you that individual libraries are quirky and complicated.
 + Because, historically, the system's package manager /was/ the C++ package manager.
+
+Continued for activating OCR:
++ Despite Tesseract including Leptonica like =#include <leptonica/allheaders.h>=, this actually doesn't work, because Leptonica does not place its include headers inside a =leptonica= subdirectory.
++ Thus, if we want to use Leptonica in our example, we must awkwardly include both the =${leptonica_SOURCE_DIR}/src= and =${leptonica_BINARY_DIR}/src= and then include it it like =#include <allheaders.h>= with an apologetic comment.
++ The =tessdata= repo takes a very long time to download, and I keep deleting =build/=.
+
+One might say: *skill issue*. True. I will figure it out.
