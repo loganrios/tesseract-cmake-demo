@@ -1,27 +1,32 @@
 #include <tesseract/baseapi.h>
-#include <allheaders.h> // in leptonica src
+#include <opencv2/opencv.hpp>
+
+#include <iostream>
+#include <string>
+#include <stdexcept>
 
 int main() {
-  char *outText;
+  cv::Mat image = cv::imread("../../sample.png");
+  if (image.empty())
+    throw std::runtime_error("could not read image");
 
-  tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
+  cv::Mat gray;
+  cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+  cv::threshold(gray, gray, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-  // Initialize tesseract-ocr with English, without specifying tessdata path
-  if (api->Init(NULL, "eng")) {
-    fprintf(stderr, "Could not initialize tesseract.\n");
-    exit(1);
-  }
+  tesseract::TessBaseAPI api = new tesseract::TessBaseAPI();
+  if (api->Init(nullptr, "eng"))
+    throw std::runtime_error("Could not initialize tesseract");
 
-  Pix *image = pixRead("../sample.png");
-  api->SetImage(image);
+  api->SetImage(gray.data, gray.cols, gray.rows, gray.channels(), gray.step);
 
-  outText = api->GetUTF8Text();
-  printf("OCR output:\n%s", outText);
+  std::unique_ptr<char[]> outText(api->GetUTF8Text());
+  std::cout << "OCR output:\n" << outText.get() << std::endl;
 
-  api->End();
-  delete api;
-  delete[] outText;
-  pixDestroy(&image);
+  // Confidence score optional
+
+  cv::imshow("Processed Image", gray);
+  cv::waitKey(0);
 
   return 0;
 }

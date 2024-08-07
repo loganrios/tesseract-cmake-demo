@@ -46,6 +46,28 @@ FetchContent_Declare(
   SOURCE_DIR ${CMAKE_BINARY_DIR}/tessdata
 )
 
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+set(OPENCV_FORCE_3RDPARTY_BUILD ON)
+set(BUILD_ZLIB OFF CACHE BOOL "")
+set(WITH_OBSENSOR OFF CACHE BOOL "")
+set(BUILD_opencv_videoio OFF CACHE BOOL "")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "")
+set(BUILD_EXAMPLES OFF CACHE BOOL "")
+set(BUILD_TESTS OFF CACHE BOOL "")
+set(BUILD_PERF_TESTS OFF CACHE BOOL "")
+set(BUILD_opencv_apps OFF CACHE BOOL "")
+set(WITH_IPP OFF CACHE BOOL "")
+set(WITH_CUDA OFF CACHE BOOL "")
+set(WITH_OPENCL OFF CACHE BOOL "")
+set(WITH_ORBBEC OFF CACHE BOOL "" FORCE)
+set(BUILD_LIST "core,imgproc,imgcodecs,highgui" CACHE STRING "" FORCE)
+
+FetchContent_Declare(
+  opencv
+  GIT_REPOSITORY https://github.com/opencv/opencv.git
+  GIT_TAG 4.10.0
+)
+
 FetchContent_MakeAvailable(zlib)
 
 set(PNG_SHARED OFF CACHE BOOL "")
@@ -84,6 +106,8 @@ target_include_directories(libtesseract
     ${ICU_ROOT}/source/i18n
 )
 
+FetchContent_MakeAvailable(opencv)
+
 add_executable(tess-demo simple.cpp)
 
 add_dependencies(tess-demo tessdata)
@@ -92,6 +116,9 @@ target_link_libraries(tess-demo
   PRIVATE
   libtesseract
   leptonica
+  opencv_core
+  opencv_imgproc
+  opencv_highgui
 )
 
 target_include_directories(tess-demo
@@ -99,5 +126,8 @@ target_include_directories(tess-demo
   ${tesseract_SOURCE_DIR}/include
   ${tesseract_BINARY_DIR}/include
   ${leptonica_SOURCE_DIR}/src
-  ${leptonica_BINARY_DIR}/src 
+  ${leptonica_BINARY_DIR}/src
+  ${opencv_SOURCE_DIR}/include
+  ${opencv_BINARY_DIR}
+  ${opencv_BINARY_DIR}/opencv2
 )

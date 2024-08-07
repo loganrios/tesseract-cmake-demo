@@ -3,7 +3,7 @@
 We're really trying out here.
 
 * Prerequisites
-+ =cmake 3.19^=
++ =cmake 3.25= minimum
 + =ninja= (but not really, just bc I hate slow builds)
 + =pkg-config= possibly, still can't tell
 
